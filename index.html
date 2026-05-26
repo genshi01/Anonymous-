@@ -2,85 +2,106 @@
 <html lang="vi" oncontextmenu="return false;">
 <head>
     <meta charset="UTF-8">
-    <title>🎭 ANONYMOUS - Secure Marketplace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎭Anonymous</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* CSS Cơ bản - Chặn chọn văn bản */
-        body { user-select: none; background: #0a0e27; color: #00ff41; font-family: monospace; }
-        .empty-state { border: 1px dashed #00ff41; padding: 20px; text-align: center; margin: 20px; }
-        .chat-box { height: 300px; border: 1px solid #00ff41; overflow-y: scroll; margin-bottom: 10px; padding: 10px; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap');
+        body { background: #050505; color: #00ff41; font-family: 'Share Tech Mono', monospace; user-select: none; }
+        .cyber-border { border: 1px solid #00ff41; box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
+        .glitch { animation: glitch 1s linear infinite; }
+        @keyframes glitch { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
+    <div id="root"></div>
 
-<div id="root"></div>
+    <script type="text/babel">
+    const { useState, useEffect } = React;
 
-<script type="text/babel">
-const { useState } = React;
+    function App() {
+        const [isLoggedIn, setIsLoggedIn] = useState(false);
+        const [username, setUsername] = useState("");
+        const [coins, setCoins] = useState(0);
+        const [activeTab, setActiveTab] = useState('market');
 
-function App() {
-    const [coins, setCoins] = useState(0);
-    const [messages, setMessages] = useState([{user: "System", text: "Chào mừng đến diễn đàn!"}]);
-    const [listings, setListings] = useState([]); // Trống để hiển thị trạng thái chưa có dữ liệu
-
-    // 1. Tính năng kiếm CoinX
-    const submitVideo = (link) => {
-        if(link.includes("tiktok.com") && link.includes("#hack")) {
-            setCoins(coins + 10000);
-            alert("Thành công! Bạn đã nhận 10.000 CoinX.");
-        } else {
-            alert("Lỗi: Link không hợp lệ hoặc thiếu #hack");
-        }
-    };
-
-    return (
-        <div className="container">
-            <h1>Số dư CoinX: {coins}</h1>
-            
-            {/* Nhiệm vụ */}
-            <div className="task-section">
-                <input id="tiktokLink" placeholder="Dán link TikTok #hack tại đây" />
-                <button onClick={() => submitVideo(document.getElementById('tiktokLink').value)}>Gửi Video</button>
-            </div>
-
-            {/* Marketplace Logic */}
-            <section>
-                <h2>Chợ dữ liệu</h2>
-                {listings.length === 0 ? (
-                    <div className="empty-state">Hiện tại chưa có dữ liệu nào được đăng bán.</div>
-                ) : (
-                    <div>/* Danh sách dữ liệu */</div>
-                )}
-            </section>
-
-            {/* Chat Toàn Cục */}
-            <div className="chat-main">
-                <div className="chat-box">
-                    {messages.map((msg, i) => <p key={i}><b>{msg.user}:</b> {msg.text}</p>)}
+        if (!isLoggedIn) {
+            return (
+                <div className="flex flex-col items-center justify-center h-screen p-4">
+                    <h1 className="text-4xl mb-8 glitch">ACCESS DENIED</h1>
+                    <input className="bg-black border p-2 mb-4 w-64 text-center" placeholder="ENTER CALLSIGN" 
+                           onChange={(e) => setUsername(e.target.value)} />
+                    <button className="border px-8 py-2 hover:bg-[#00ff41] hover:text-black transition" 
+                            onClick={() => setIsLoggedIn(true)}>INITIATE ACCESS</button>
                 </div>
-                <input onKeyDown={(e) => {
-                    if(e.key === 'Enter') {
-                        setMessages([...messages, {user: "Bạn", text: e.target.value}]);
-                        e.target.value = '';
-                    }
-                }} placeholder="Nhập tin nhắn..." />
+            );
+        }
+
+        return (
+            <div className="max-w-4xl mx-auto p-4">
+                <header className="flex justify-between items-center mb-8 border-b border-[#00ff41] pb-4">
+                    <h2 className="text-xl font-bold">OPERATOR: {username}</h2>
+                    <div className="bg-[#00ff41] text-black px-4 py-1 rounded">COINX: {coins}</div>
+                </header>
+
+                <nav className="flex gap-4 mb-8">
+                    {['MARKET', 'GLOBAL CHAT', 'EARN COIN'].map(tab => (
+                        <button key={tab} className={`px-4 py-2 ${activeTab === tab.toLowerCase().replace(' ', '') ? 'bg-[#00ff41] text-black' : 'border'}`}
+                                onClick={() => setActiveTab(tab.toLowerCase().replace(' ', ''))}>{tab}</button>
+                    ))}
+                </nav>
+
+                <main className="cyber-border p-6 min-h-[400px]">
+                    {activeTab === 'market' && (
+                        <div className="text-center py-20">
+                            <h3 className="text-2xl text-red-500">SYSTEM ALERT</h3>
+                            <p>Current directory empty. No data available for acquisition.</p>
+                        </div>
+                    )}
+                    {activeTab === 'globalchat' && <ChatRoom />}
+                    {activeTab === 'earncoin' && <TaskCenter setCoins={setCoins} coins={coins} />}
+                </main>
             </div>
-        </div>
-    );
-}
+        );
+    }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
-</script>
+    function TaskCenter({setCoins, coins}) {
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            const link = e.target.link.value;
+            if(link.includes('tiktok.com') && (link.includes('#hack') || link.includes('tech'))) {
+                setCoins(coins + 10000);
+                alert("TRANSACTION SUCCESS: +10,000 COINX");
+            } else {
+                alert("TRANSACTION FAILED: INVALID TAGS/SOURCE");
+            }
+        };
+        return (
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <p>Mission: Submit TikTok link with #hack or tech related content.</p>
+                <input name="link" className="bg-black border p-2 w-full" placeholder="https://tiktok.com/..." required />
+                <button type="submit" className="border py-2">EXECUTE SUBMISSION</button>
+            </form>
+        );
+    }
 
-<script>
-    // Chặn Copy / Paste / Cut
-    document.addEventListener('copy', (e) => e.preventDefault());
-    document.addEventListener('paste', (e) => e.preventDefault());
-    document.addEventListener('cut', (e) => e.preventDefault());
-</script>
+    function ChatRoom() {
+        return <div className="h-64 overflow-y-auto">System: Public channel active. All communications encrypted.</div>;
+    }
 
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+    </script>
+
+    <script>
+        // Bảo mật tối đa
+        document.addEventListener('keydown', (e) => {
+            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73)) e.preventDefault();
+        });
+        document.addEventListener('copy', (e) => e.preventDefault());
+    </script>
 </body>
 </html>
