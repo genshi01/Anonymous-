@@ -2,40 +2,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CoinX Forum</title>  <script src="https://cdn.tailwindcss.com"></script>  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>  <style>
+  <title>CoinX Underground</title>  <script src="https://cdn.tailwindcss.com"></script>  <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #050505;
-      overflow-x: hidden;
+      font-family: Inter, sans-serif;
+      background: #060606;
       color: white;
+      overflow-x: hidden;
     }
 
-    .bg-animation {
+    .bg {
       position: fixed;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
+      inset: 0;
+      z-index: -2;
       background:
-        radial-gradient(circle at top left, rgba(0,255,255,0.15), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(255,0,100,0.15), transparent 30%),
-        #050505;
-      animation: pulse 6s infinite alternate;
+        radial-gradient(circle at top left, rgba(0,255,255,0.15), transparent 25%),
+        radial-gradient(circle at bottom right, rgba(255,0,120,0.15), transparent 25%),
+        #060606;
     }
 
-    @keyframes pulse {
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -1;
+      animation: moveGrid 8s linear infinite;
+    }
+
+    @keyframes moveGrid {
       from {
-        filter: hue-rotate(0deg);
+        transform: translateY(0px);
       }
       to {
-        filter: hue-rotate(40deg);
+        transform: translateY(40px);
       }
     }
 
     .glass {
       background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.08);
       backdrop-filter: blur(12px);
+      box-shadow: 0 0 20px rgba(0,255,255,0.05);
+    }
+
+    .neon {
+      box-shadow: 0 0 15px rgba(0,255,255,0.25);
+    }
+
+    .fade {
+      animation: fade 0.3s ease;
+    }
+
+    @keyframes fade {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0px);
+      }
     }
 
     .scrollbar::-webkit-scrollbar {
@@ -47,379 +80,488 @@
       border-radius: 20px;
     }
   </style></head>
-<body>
-  <div class="bg-animation"></div>  <!-- NAVBAR -->  <nav class="flex justify-between items-center p-4 glass sticky top-0 z-50">
-    <div>
-      <h1 class="text-3xl font-bold text-cyan-400">CoinX Forum</h1>
-    </div><div class="flex gap-4 items-center">
-  <button class="hover:text-cyan-400">Buy Data</button>
-  <button class="hover:text-cyan-400">Sell Data</button>
-  <button class="hover:text-cyan-400">Tasks</button>
-  <button class="hover:text-cyan-400">Chat</button>
+<body><div class="bg"></div>
+<div class="grid-overlay"></div><!-- NAVBAR --><header class="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+  <div>
+    <h1 class="text-3xl font-bold text-cyan-400">CoinX Underground</h1>
+    <div class="text-xs text-gray-400">marketplace • realtime • underground</div>
+  </div>  <div class="flex items-center gap-4">
+    <button onclick="switchTab('market')" class="hover:text-cyan-400">Market</button>
+    <button onclick="switchTab('tasks')" class="hover:text-cyan-400">Tasks</button>
+    <button onclick="switchTab('chat')" class="hover:text-cyan-400">Chat</button><div id="authArea"></div>
 
-  <div id="userPanel" class="hidden flex items-center gap-3">
-    <span id="username"></span>
-    <span class="text-yellow-400">🪙 <span id="balance">0</span></span>
-    <button onclick="logout()" class="bg-red-500 px-3 py-1 rounded">Logout</button>
   </div>
+</header><div class="max-w-7xl mx-auto p-5">  <!-- USER PANEL -->  <div id="userPanel" class="glass rounded-3xl p-5 mb-5 hidden fade">
+    <div class="flex flex-wrap justify-between gap-4 items-center">
+      <div>
+        <div class="text-2xl font-bold text-cyan-400" id="welcomeName"></div>
+        <div class="text-gray-400 text-sm">Member access granted</div>
+      </div><div class="flex gap-4 items-center">
+    <div class="glass px-5 py-3 rounded-2xl neon">
+      🪙 <span id="coinBalance">0</span> CoinX
+    </div>
 
-  <button id="loginBtn" onclick="openAuth()" class="bg-cyan-500 px-4 py-2 rounded-xl hover:bg-cyan-400">
-    Login
-  </button>
+    <button onclick="logout()" class="bg-red-500 hover:bg-red-400 px-4 py-2 rounded-2xl">
+      Logout
+    </button>
+  </div>
 </div>
 
-  </nav>  <!-- MAIN -->  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4"><!-- LEFT -->
-<div class="glass rounded-2xl p-4 h-fit">
-  <h2 class="text-xl mb-4 text-cyan-400">Categories</h2>
+  </div>  <div class="grid lg:grid-cols-3 gap-5"><!-- LEFT -->
+<div class="space-y-5">
 
-  <div class="space-y-2">
-    <div class="bg-black/30 p-3 rounded-xl hover:bg-cyan-500/20 cursor-pointer">
-      Combo
+  <div class="glass rounded-3xl p-5 fade">
+    <h2 class="text-xl text-cyan-400 mb-4">Categories</h2>
+
+    <div class="space-y-3">
+      <div class="bg-black/30 p-4 rounded-2xl hover:bg-cyan-500/20 cursor-pointer transition">
+        Combo Accounts
+      </div>
+
+      <div class="bg-black/30 p-4 rounded-2xl hover:bg-cyan-500/20 cursor-pointer transition">
+        Fake Databases
+      </div>
+
+      <div class="bg-black/30 p-4 rounded-2xl hover:bg-cyan-500/20 cursor-pointer transition">
+        Streaming Access
+      </div>
+
+      <div class="bg-black/30 p-4 rounded-2xl hover:bg-cyan-500/20 cursor-pointer transition">
+        Random Drops
+      </div>
     </div>
+  </div>
 
-    <div class="bg-black/30 p-3 rounded-xl hover:bg-cyan-500/20 cursor-pointer">
-      Databases
-    </div>
+  <div class="glass rounded-3xl p-5 fade">
+    <h2 class="text-xl text-pink-400 mb-4">System Stats</h2>
 
-    <div class="bg-black/30 p-3 rounded-xl hover:bg-cyan-500/20 cursor-pointer">
-      Streaming
-    </div>
+    <div class="space-y-3 text-sm">
+      <div class="flex justify-between">
+        <span>Users Online</span>
+        <span id="onlineCount">12</span>
+      </div>
 
-    <div class="bg-black/30 p-3 rounded-xl hover:bg-cyan-500/20 cursor-pointer">
-      Accounts
+      <div class="flex justify-between">
+        <span>Market Posts</span>
+        <span id="postCount">0</span>
+      </div>
+
+      <div class="flex justify-between">
+        <span>Total CoinX</span>
+        <span id="totalCoin">0</span>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- CENTER -->
-<div class="space-y-4">
+<div class="space-y-5 lg:col-span-2">
 
-  <!-- TASK REWARD -->
-  <div class="glass rounded-2xl p-4">
-    <h2 class="text-xl text-yellow-400 mb-3">Earn CoinX</h2>
-
-    <p class="text-sm text-gray-400 mb-3">
-      Paste TikTok link with hashtags:
-      #gaixinh #gainhay
-    </p>
-
-    <input
-      id="videoLink"
-      type="text"
-      placeholder="TikTok video URL"
-      class="w-full bg-black/40 p-3 rounded-xl outline-none"
-    />
-
-    <button
-      onclick="submitTask()"
-      class="mt-3 bg-yellow-500 hover:bg-yellow-400 text-black px-4 py-2 rounded-xl w-full"
-    >
-      Check Link (+400 CoinX)
-    </button>
-  </div>
-
-  <!-- MARKETPLACE -->
-  <div class="glass rounded-2xl p-4">
+  <!-- TASKS -->
+  <section id="tasksTab" class="glass rounded-3xl p-5 fade">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl text-cyan-400">Marketplace</h2>
+      <h2 class="text-2xl text-yellow-400">TikTok Reward Task</h2>
+      <div class="text-sm text-gray-400">+400 CoinX per valid video</div>
+    </div>
+
+    <div class="space-y-3">
+      <input
+        id="taskLink"
+        type="text"
+        placeholder="Paste TikTok link..."
+        class="w-full bg-black/40 p-4 rounded-2xl outline-none border border-transparent focus:border-cyan-400"
+      />
 
       <button
-        onclick="createPost()"
-        class="bg-cyan-500 px-4 py-2 rounded-xl"
+        onclick="submitTask()"
+        class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-4 rounded-2xl transition"
+      >
+        Validate Link
+      </button>
+    </div>
+  </section>
+
+  <!-- MARKET -->
+  <section id="marketTab" class="glass rounded-3xl p-5 fade">
+
+    <div class="flex justify-between items-center mb-5">
+      <h2 class="text-2xl text-cyan-400">Marketplace</h2>
+
+      <button
+        onclick="openSellModal()"
+        class="bg-cyan-500 hover:bg-cyan-400 px-5 py-3 rounded-2xl font-bold"
       >
         Sell Data
       </button>
     </div>
 
-    <div id="posts" class="space-y-3">
+    <div id="marketPosts" class="space-y-4"></div>
+  </section>
+
+  <!-- CHAT -->
+  <section id="chatTab" class="glass rounded-3xl p-5 fade">
+    <h2 class="text-2xl text-pink-400 mb-4">Global Chat</h2>
+
+    <div id="chatBox" class="h-[300px] overflow-y-auto scrollbar space-y-3 mb-4"></div>
+
+    <div class="flex gap-3">
+      <input
+        id="chatInput"
+        type="text"
+        placeholder="Type message..."
+        class="flex-1 bg-black/40 p-4 rounded-2xl outline-none"
+      />
+
+      <button
+        onclick="sendMessage()"
+        class="bg-pink-500 hover:bg-pink-400 px-6 rounded-2xl"
+      >
+        Send
+      </button>
     </div>
-  </div>
+  </section>
+
 </div>
 
-<!-- RIGHT -->
-<div class="glass rounded-2xl p-4 flex flex-col h-[700px]">
-  <h2 class="text-xl text-pink-400 mb-4">Global Chat</h2>
-
-  <div
-    id="chatBox"
-    class="flex-1 overflow-y-auto scrollbar space-y-2 mb-4"
-  ></div>
-
-  <div class="flex gap-2">
-    <input
-      id="chatInput"
-      type="text"
-      placeholder="Type message..."
-      class="flex-1 bg-black/40 p-3 rounded-xl outline-none"
-    />
-
-    <button
-      onclick="sendMessage()"
-      class="bg-pink-500 px-4 rounded-xl"
-    >
-      Send
-    </button>
   </div>
-</div>
+</div><!-- LOGIN MODAL --><div id="loginModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+  <div class="glass rounded-3xl p-6 w-[360px] fade"><h2 class="text-3xl text-cyan-400 mb-5">Access Portal</h2>
 
-  </div>  <!-- AUTH MODAL -->  <div
-    id="authModal"
-    class="hidden fixed inset-0 bg-black/70 flex items-center justify-center"
-  >
-    <div class="glass p-6 rounded-2xl w-[350px]">
-      <h2 class="text-2xl text-cyan-400 mb-4">Login / Register</h2><input
-    id="email"
-    type="email"
-    placeholder="Email"
-    class="w-full bg-black/40 p-3 rounded-xl mb-3"
-  />
+<input
+  id="usernameInput"
+  type="text"
+  placeholder="Username"
+  class="w-full bg-black/40 p-4 rounded-2xl mb-4 outline-none"
+/>
 
-  <input
-    id="password"
-    type="password"
-    placeholder="Password"
-    class="w-full bg-black/40 p-3 rounded-xl mb-3"
-  />
+<button
+  onclick="register()"
+  class="w-full bg-cyan-500 hover:bg-cyan-400 py-4 rounded-2xl font-bold"
+>
+  Enter System
+</button>
 
+  </div>
+</div><!-- SELL MODAL --><div id="sellModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+  <div class="glass rounded-3xl p-6 w-[420px] fade"><h2 class="text-3xl text-cyan-400 mb-5">Create Listing</h2>
+
+<input
+  id="postTitle"
+  type="text"
+  placeholder="Title"
+  class="w-full bg-black/40 p-4 rounded-2xl mb-3 outline-none"
+/>
+
+<textarea
+  id="postDesc"
+  placeholder="Description"
+  class="w-full bg-black/40 p-4 rounded-2xl mb-3 outline-none h-[120px]"
+></textarea>
+
+<input
+  id="postPrice"
+  type="number"
+  placeholder="Price"
+  class="w-full bg-black/40 p-4 rounded-2xl mb-4 outline-none"
+/>
+
+<div class="flex gap-3">
   <button
-    onclick="register()"
-    class="w-full bg-cyan-500 py-3 rounded-xl mb-2"
+    onclick="createPost()"
+    class="flex-1 bg-cyan-500 hover:bg-cyan-400 py-4 rounded-2xl"
   >
-    Register
+    Publish
   </button>
 
   <button
-    onclick="login()"
-    class="w-full bg-green-500 py-3 rounded-xl"
+    onclick="closeSellModal()"
+    class="flex-1 bg-red-500 hover:bg-red-400 py-4 rounded-2xl"
   >
-    Login
+    Cancel
   </button>
 </div>
 
-  </div>  <script>
-    // =============================
-    // FIREBASE CONFIG
-    // =============================
+  </div>
+</div><script>
 
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "123456",
-      appId: "APP_ID"
+let currentUser = null;
+
+let users = JSON.parse(localStorage.getItem('coinx_users')) || [];
+let posts = JSON.parse(localStorage.getItem('coinx_posts')) || [];
+let chats = JSON.parse(localStorage.getItem('coinx_chat')) || [];
+
+function saveData() {
+  localStorage.setItem('coinx_users', JSON.stringify(users));
+  localStorage.setItem('coinx_posts', JSON.stringify(posts));
+  localStorage.setItem('coinx_chat', JSON.stringify(chats));
+}
+
+function openLogin() {
+  document.getElementById('loginModal').classList.remove('hidden');
+}
+
+function register() {
+  const username = document.getElementById('usernameInput').value.trim();
+
+  if (!username) {
+    return alert('Enter username');
+  }
+
+  let existing = users.find(u => u.username === username);
+
+  if (existing) {
+    currentUser = existing;
+  } else {
+    currentUser = {
+      username,
+      balance: 1600
     };
 
-    firebase.initializeApp(firebaseConfig);
+    users.push(currentUser);
+  }
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+  saveData();
+  updateUI();
 
-    let currentUser = null;
+  document.getElementById('loginModal').classList.add('hidden');
+}
 
-    // =============================
-    // AUTH
-    // =============================
+function logout() {
+  currentUser = null;
+  updateUI();
+}
 
-    function openAuth() {
-      document.getElementById('authModal').classList.remove('hidden');
+function updateUI() {
+
+  const authArea = document.getElementById('authArea');
+
+  if (!currentUser) {
+    authArea.innerHTML = `
+      <button onclick="openLogin()" class="bg-cyan-500 hover:bg-cyan-400 px-5 py-2 rounded-2xl font-bold">
+        Login
+      </button>
+    `;
+
+    document.getElementById('userPanel').classList.add('hidden');
+
+  } else {
+
+    authArea.innerHTML = `
+      <div class="glass px-4 py-2 rounded-2xl">
+        ${currentUser.username}
+      </div>
+    `;
+
+    document.getElementById('userPanel').classList.remove('hidden');
+
+    document.getElementById('welcomeName').innerText = currentUser.username;
+    document.getElementById('coinBalance').innerText = currentUser.balance;
+  }
+
+  renderPosts();
+  renderChat();
+  updateStats();
+}
+
+function updateStats() {
+  document.getElementById('postCount').innerText = posts.length;
+
+  const total = users.reduce((a,b)=>a+b.balance,0);
+
+  document.getElementById('totalCoin').innerText = total;
+}
+
+function openSellModal() {
+  if (!currentUser) {
+    return alert('Login first');
+  }
+
+  document.getElementById('sellModal').classList.remove('hidden');
+}
+
+function closeSellModal() {
+  document.getElementById('sellModal').classList.add('hidden');
+}
+
+function createPost() {
+
+  const title = document.getElementById('postTitle').value;
+  const desc = document.getElementById('postDesc').value;
+  const price = document.getElementById('postPrice').value;
+
+  if (!title || !price) {
+    return alert('Missing fields');
+  }
+
+  posts.unshift({
+    title,
+    desc,
+    price,
+    seller: currentUser.username
+  });
+
+  saveData();
+  renderPosts();
+  closeSellModal();
+  updateStats();
+}
+
+function renderPosts() {
+
+  const market = document.getElementById('marketPosts');
+  market.innerHTML = '';
+
+  posts.forEach((p, index) => {
+
+    market.innerHTML += `
+      <div class="glass rounded-3xl p-5 hover:scale-[1.01] transition-all fade">
+
+        <div class="flex justify-between items-center mb-3">
+          <div>
+            <div class="text-xl text-cyan-300 font-bold">${p.title}</div>
+            <div class="text-sm text-gray-400">seller: ${p.seller}</div>
+          </div>
+
+          <div class="text-yellow-400 font-bold text-lg">
+            🪙 ${p.price}
+          </div>
+        </div>
+
+        <div class="text-gray-300 mb-4">
+          ${p.desc}
+        </div>
+
+        <button
+          onclick="buyPost(${index})"
+          class="bg-cyan-500 hover:bg-cyan-400 px-5 py-3 rounded-2xl font-bold"
+        >
+          Buy Now
+        </button>
+      </div>
+    `;
+  });
+}
+
+function buyPost(index) {
+
+  if (!currentUser) {
+    return alert('Login first');
+  }
+
+  const post = posts[index];
+
+  if (currentUser.balance < post.price) {
+    return alert('Not enough CoinX');
+  }
+
+  currentUser.balance -= Number(post.price);
+
+  users = users.map(u => {
+
+    if (u.username === currentUser.username) {
+      return currentUser;
     }
 
-    async function register() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-
-      try {
-        const res = await auth.createUserWithEmailAndPassword(email, password);
-
-        await db.collection('users').doc(res.user.uid).set({
-          email,
-          balance: 1600,
-          createdAt: Date.now()
-        });
-
-        alert('Account created');
-      } catch (err) {
-        alert(err.message);
-      }
+    if (u.username === post.seller) {
+      u.balance += Number(post.price);
     }
 
-    async function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+    return u;
+  });
 
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        document.getElementById('authModal').classList.add('hidden');
-      } catch (err) {
-        alert(err.message);
-      }
+  saveData();
+  updateUI();
+
+  alert('Purchase successful');
+}
+
+function sendMessage() {
+
+  if (!currentUser) {
+    return alert('Login first');
+  }
+
+  const input = document.getElementById('chatInput');
+  const message = input.value.trim();
+
+  if (!message) return;
+
+  chats.push({
+    user: currentUser.username,
+    message
+  });
+
+  saveData();
+  renderChat();
+
+  input.value = '';
+}
+
+function renderChat() {
+
+  const chatBox = document.getElementById('chatBox');
+  chatBox.innerHTML = '';
+
+  chats.slice(-40).forEach(c => {
+
+    chatBox.innerHTML += `
+      <div class="glass p-4 rounded-2xl fade">
+        <div class="text-cyan-400 text-sm mb-1">${c.user}</div>
+        <div>${c.message}</div>
+      </div>
+    `;
+  });
+
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function submitTask() {
+
+  if (!currentUser) {
+    return alert('Login first');
+  }
+
+  const link = document.getElementById('taskLink').value;
+
+  if (!link.includes('tiktok')) {
+    return alert('Invalid TikTok link');
+  }
+
+  currentUser.balance += 400;
+
+  users = users.map(u => {
+    if (u.username === currentUser.username) {
+      return currentUser;
     }
+    return u;
+  });
 
-    async function logout() {
-      await auth.signOut();
-    }
+  saveData();
+  updateUI();
 
-    auth.onAuthStateChanged(async user => {
-      if (!user) {
-        currentUser = null;
-        document.getElementById('loginBtn').classList.remove('hidden');
-        document.getElementById('userPanel').classList.add('hidden');
-        return;
-      }
+  alert('+400 CoinX rewarded');
+}
 
-      currentUser = user;
+function switchTab(tab) {
 
-      const doc = await db.collection('users').doc(user.uid).get();
-      const data = doc.data();
+  document.getElementById('marketTab').scrollIntoView({
+    behavior: 'smooth'
+  });
 
-      document.getElementById('username').innerText = user.email;
-      document.getElementById('balance').innerText = data.balance;
-
-      document.getElementById('loginBtn').classList.add('hidden');
-      document.getElementById('userPanel').classList.remove('hidden');
+  if (tab === 'tasks') {
+    document.getElementById('tasksTab').scrollIntoView({
+      behavior: 'smooth'
     });
+  }
 
-    // =============================
-    // MARKETPLACE
-    // =============================
+  if (tab === 'chat') {
+    document.getElementById('chatTab').scrollIntoView({
+      behavior: 'smooth'
+    });
+  }
+}
 
-    async function createPost() {
-      if (!currentUser) {
-        return alert('Login first');
-      }
+updateUI();
 
-      const title = prompt('Post title');
-      const description = prompt('Description');
-      const price = prompt('Price');
-
-      if (!title) return;
-
-      await db.collection('posts').add({
-        title,
-        description,
-        price,
-        seller: currentUser.email,
-        createdAt: Date.now()
-      });
-    }
-
-    db.collection('posts')
-      .orderBy('createdAt', 'desc')
-      .onSnapshot(snapshot => {
-
-        const posts = document.getElementById('posts');
-        posts.innerHTML = '';
-
-        snapshot.forEach(doc => {
-          const p = doc.data();
-
-          posts.innerHTML += `
-            <div class="bg-black/30 p-4 rounded-2xl border border-cyan-500/20 hover:border-cyan-400 transition-all">
-              <div class="flex justify-between items-center mb-2">
-                <h3 class="text-lg text-cyan-300">${p.title}</h3>
-                <span class="text-yellow-400">🪙 ${p.price}</span>
-              </div>
-
-              <p class="text-gray-300 mb-2">${p.description}</p>
-
-              <div class="flex justify-between items-center text-sm text-gray-400">
-                <span>${p.seller}</span>
-                <button class="bg-cyan-500 px-3 py-1 rounded-xl">
-                  Buy
-                </button>
-              </div>
-            </div>
-          `;
-        });
-      });
-
-    // =============================
-    // CHAT
-    // =============================
-
-    async function sendMessage() {
-      if (!currentUser) {
-        return alert('Login first');
-      }
-
-      const input = document.getElementById('chatInput');
-      const message = input.value.trim();
-
-      if (!message) return;
-
-      await db.collection('globalChat').add({
-        user: currentUser.email,
-        message,
-        createdAt: Date.now()
-      });
-
-      input.value = '';
-    }
-
-    db.collection('globalChat')
-      .orderBy('createdAt', 'asc')
-      .onSnapshot(snapshot => {
-
-        const chatBox = document.getElementById('chatBox');
-        chatBox.innerHTML = '';
-
-        snapshot.forEach(doc => {
-          const c = doc.data();
-
-          chatBox.innerHTML += `
-            <div class="bg-black/30 p-3 rounded-xl">
-              <div class="text-cyan-400 text-sm mb-1">${c.user}</div>
-              <div>${c.message}</div>
-            </div>
-          `;
-        });
-
-        chatBox.scrollTop = chatBox.scrollHeight;
-      });
-
-    // =============================
-    // TASK REWARD
-    // =============================
-
-    async function submitTask() {
-      if (!currentUser) {
-        return alert('Login first');
-      }
-
-      const link = document.getElementById('videoLink').value;
-
-      if (!link.includes('tiktok')) {
-        return alert('Invalid TikTok link');
-      }
-
-      const ok = confirm(
-        'Did video contain #gaixinh and #gainhay ?'
-      );
-
-      if (!ok) {
-        return alert('Task failed');
-      }
-
-      const userRef = db.collection('users').doc(currentUser.uid);
-
-      const doc = await userRef.get();
-      const balance = doc.data().balance || 0;
-
-      await userRef.update({
-        balance: balance + 400
-      });
-
-      await db.collection('rewardLogs').add({
-        uid: currentUser.uid,
-        link,
-        reward: 400,
-        createdAt: Date.now()
-      });
-
-      document.getElementById('balance').innerText = balance + 400;
-
-      alert('+400 CoinX');
-    }
-  </script></body>
+</script></body>
 </html>
