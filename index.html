@@ -1,99 +1,599 @@
 <!DOCTYPE html>
-<html lang="vi" oncontextmenu="return false;">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎭 ANONYMOUS | White Hat Portal</title>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <title>🎭 ANONYMOUS - Fake Data Marketplace</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap');
-        body { background: #050810; color: #00ff41; font-family: 'IBM Plex Mono', monospace; user-select: none; }
-        .cyber-panel { background: rgba(10, 14, 39, 0.95); border: 1px solid #00ff41; border-radius: 8px; box-shadow: 0 0 15px rgba(0, 255, 65, 0.1); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Orbitron:wght@400;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+        :root {
+            --primary: #00ff41;
+            --primary-dark: #00cc33;
+            --secondary: #ff006e;
+            --tertiary: #00d9ff;
+            --dark-bg: #0a0e27;
+            --darker-bg: #050810;
+            --text-light: #e0e0e0;
+            --text-muted: #808080;
+            --border-color: #1a2540;
+            --accent: #ffd60a;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker-bg) 0%, #1a0033 100%);
+            color: var(--text-light);
+            font-family: 'IBM Plex Mono', monospace;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 255, 65, 0.02) 0px,
+                    rgba(0, 255, 65, 0.02) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
+            pointer-events: none;
+            z-index: 1;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.27; }
+            5% { opacity: 0.3; }
+            10% { opacity: 0.27; }
+            100% { opacity: 0.27; }
+        }
+
+        #root {
+            position: relative;
+            z-index: 2;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(180deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 37, 64, 0.5) 100%);
+            border-bottom: 2px solid var(--primary);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary), 0 0 20px rgba(0, 255, 65, 0.5);
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .logo:hover {
+            text-shadow: 0 0 20px var(--primary), 0 0 40px rgba(0, 255, 65, 0.8);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .coin-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 255, 65, 0.1);
+            padding: 8px 16px;
+            border: 1px solid var(--primary);
+            border-radius: 5px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .coin-icon {
+            font-size: 18px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--darker-bg);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--darker-bg);
+            color: var(--primary);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: var(--darker-bg);
+        }
+
+        /* MAIN CONTENT */
+        main {
+            padding: 40px 0;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--primary);
+            letter-spacing: 3px;
+        }
+
+        .hero p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* TAB NAVIGATION */
+        .tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            position: relative;
+            transition: color 0.3s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -21px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* MARKETPLACE GRID */
+        .marketplace-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .data-card {
+            background: linear-gradient(135deg, rgba(26, 37, 64, 0.6) 0%, rgba(40, 20, 60, 0.4) 100%);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .data-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .data-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2), inset 0 0 20px rgba(0, 255, 65, 0.05);
+            transform: translateY(-5px);
+        }
+
+        .data-card:hover::before {
+            left: 100%;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .device-name {
+            font-weight: bold;
+            color: var(--tertiary);
+            font-size: 16px;
+        }
+
+        .device-model {
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .price-tag {
+            background: var(--secondary);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .card-body {
+            margin-bottom: 15px;
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            color: var(--primary);
+        }
+
+        .card-footer {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-buy {
+            flex: 1;
+            background: var(--primary);
+            color: var(--darker-bg);
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-buy:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .btn-view {
+            flex: 1;
+            background: transparent;
+            color: var(--tertiary);
+            border: 2px solid var(--tertiary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-view:hover {
+            background: var(--tertiary);
+            color: var(--darker-bg);
+        }
+
+        /* CREATE LISTING FORM */
+        .form-container {
+            background: linear-gradient(135deg, rgba(26, 37, 64, 0.8) 0%, rgba(40, 20, 60, 0.6) 100%);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-light);
+            font-family: 'IBM Plex Mono', monospace;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: modalIn 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.98) 0%, rgba(40, 20, 60, 0.8) 100%);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(0, 255, 65, 0.2);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.2);
+        }
+
+        /* LEADERBOARD */
+        .leaderboard-container {
+            background: linear-gradient(135deg, rgba(26, 37, 64, 0.8) 0%, rgba(40, 20, 60, 0.6) 100%);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .leaderboard-header {
+            background: rgba(0, 255, 65, 0.1);
+            padding: 20px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .leaderboard-header h2 {
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .leaderboard-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background 0.3s;
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        .rank {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary);
+            min-width: 40px;
+        }
+
+        .rank.top1 { color: var(--accent); }
+        .rank.top2 { color: var(--tertiary); }
+        .rank.top3 { color: var(--secondary); }
+
+        .user-item {
+            flex: 1;
+        }
+
+        .user-name {
+            color: var(--text-light);
+            font-weight: bold;
+        }
+
+        .user-sales {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .user-coins {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .marketplace-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+                gap: 15px;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
-
     <script type="text/babel">
-    const { useState, useEffect } = React;
-    
-    // CẤU HÌNH FIREBASE (Dán config của bạn vào đây)
-    const firebaseConfig = { databaseURL: "https://your-project-id.firebaseio.com" };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    function App() {
-        const [user, setUser] = useState(null);
-        const [coins, setCoins] = useState(0);
-        const [messages, setMessages] = useState([]);
-        const [tab, setTab] = useState('chat');
-
-        // Đăng nhập giả lập
-        const handleLogin = (e) => {
-            e.preventDefault();
-            if(e.target.pass.value === "admin") setUser("Hacker_" + Math.floor(Math.random()*999));
-        };
-
-        // Gửi link kiếm Coin
-        const submitMission = (link) => {
-            if(link.includes('tiktok.com') && (link.includes('#hack') || link.includes('tech'))) {
-                const newCoins = coins + 10000;
-                setCoins(newCoins);
-                alert("MISSION SUCCESS: +10,000 CoinX");
-            } else {
-                alert("ACCESS DENIED: Invalid Source/Tag");
-            }
-        };
-
-        if(!user) return (
-            <div className="flex justify-center items-center h-screen">
-                <form onSubmit={handleLogin} className="cyber-panel p-8 w-80 text-center">
-                    <h2 className="mb-4">AUTHENTICATION</h2>
-                    <input name="pass" type="password" className="bg-black border w-full p-2 mb-4 text-center" placeholder="PASSWORD" />
-                    <button className="border px-4 py-2 hover:bg-[#00ff41] hover:text-black">CONNECT</button>
-                </form>
-            </div>
-        );
-
-        return (
-            <div className="max-w-4xl mx-auto p-4">
-                <header className="flex justify-between mb-8">
-                    <div>Welcome: <span className="text-white">{user}</span></div>
-                    <div>COINX: <span className="text-[#00ff41]">{coins}</span></div>
-                </header>
-
-                <div className="flex gap-4 mb-4">
-                    <button onClick={() => setTab('chat')} className="border px-4 py-1">GLOBAL CHAT</button>
-                    <button onClick={() => setTab('earn')} className="border px-4 py-1">EARN COINX</button>
+        // Bạn có thể bắt đầu xây dựng React component tại đây
+        const App = () => {
+            return (
+                <div className="container">
+                    <h1>Chào mừng đến với hệ thống</h1>
                 </div>
-
-                <main className="cyber-panel p-6 min-h-[300px]">
-                    {tab === 'chat' && <div className="text-sm">Public Channel: No data yet.</div>}
-                    {tab === 'earn' && (
-                        <div>
-                            <p className="mb-4">Submit TikTok Link (#hack / Tech):</p>
-                            <input id="tiktokLink" className="bg-black border w-full p-2 mb-2" />
-                            <button onClick={() => submitMission(document.getElementById('tiktokLink').value)} className="border p-2">SUBMIT MISSION</button>
-                        </div>
-                    )}
-                </main>
-            </div>
-        );
-    }
-
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-    </script>
-
-    <script>
-        // Chặn copy/inspect
-        document.addEventListener('keydown', e => { if(e.keyCode === 123) e.preventDefault(); });
-        document.addEventListener('copy', e => e.preventDefault());
+            )
+        };
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
