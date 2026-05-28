@@ -1,567 +1,260 @@
-<!DOCTYPE html><html lang="vi">
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CoinX Underground</title>  <script src="https://cdn.tailwindcss.com"></script>  <style>
-    * {
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GENSHI | Red Team Portfolio</title>
 
-    body {
-      margin: 0;
-      font-family: Inter, sans-serif;
-      background: #060606;
-      color: white;
-      overflow-x: hidden;
-    }
+<!-- FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
 
-    .bg {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      background:
-        radial-gradient(circle at top left, rgba(0,255,255,0.15), transparent 25%),
-        radial-gradient(circle at bottom right, rgba(255,0,120,0.15), transparent 25%),
-        #060606;
-    }
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
 
-    .grid-overlay {
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      z-index: -1;
-      animation: moveGrid 8s linear infinite;
-    }
+body{
+  background:#020617;
+  color:#e2e8f0;
+  font-family:Consolas, monospace;
+  overflow-x:hidden;
+}
 
-    @keyframes moveGrid {
-      from {
-        transform: translateY(0px);
-      }
-      to {
-        transform: translateY(40px);
-      }
-    }
+/* PARTICLES */
+#bg{
+  position:fixed;
+  width:100%;
+  height:100%;
+  z-index:-1;
+}
 
-    .glass {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
-      backdrop-filter: blur(12px);
-      box-shadow: 0 0 20px rgba(0,255,255,0.05);
-    }
+/* HEADER */
+header{
+  text-align:center;
+  padding:60px 20px;
+}
+h1{
+  color:#22c55e;
+  font-size:45px;
+  font-family:'Orbitron';
+}
 
-    .neon {
-      box-shadow: 0 0 15px rgba(0,255,255,0.25);
-    }
+/* TYPING */
+.typing{
+  border-right:2px solid #22c55e;
+  white-space:nowrap;
+  overflow:hidden;
+  width:0;
+  animation:typing 4s steps(40,end) forwards, blink .7s infinite;
+}
+@keyframes typing{to{width:100%}}
+@keyframes blink{50%{border-color:transparent}}
 
-    .fade {
-      animation: fade 0.3s ease;
-    }
+/* CONTAINER */
+.container{
+  max-width:1000px;
+  margin:auto;
+  padding:20px;
+}
 
-    @keyframes fade {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0px);
-      }
-    }
+/* CARD */
+.card{
+  background:#020617;
+  border:1px solid #22c55e33;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:20px;
+  transition:0.3s;
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 0 20px #22c55e44;
+}
 
-    .scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:15px;
+}
 
-    .scrollbar::-webkit-scrollbar-thumb {
-      background: cyan;
-      border-radius: 20px;
-    }
-  </style></head>
-<body><div class="bg"></div>
-<div class="grid-overlay"></div><!-- NAVBAR --><header class="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
-  <div>
-    <h1 class="text-3xl font-bold text-cyan-400">CoinX Underground</h1>
-    <div class="text-xs text-gray-400">marketplace • realtime • underground</div>
-  </div>  <div class="flex items-center gap-4">
-    <button onclick="switchTab('market')" class="hover:text-cyan-400">Market</button>
-    <button onclick="switchTab('tasks')" class="hover:text-cyan-400">Tasks</button>
-    <button onclick="switchTab('chat')" class="hover:text-cyan-400">Chat</button><div id="authArea"></div>
+/* ITEM */
+.item{
+  border:1px solid #334155;
+  padding:15px;
+  border-radius:10px;
+}
 
-  </div>
-</header><div class="max-w-7xl mx-auto p-5">  <!-- USER PANEL -->  <div id="userPanel" class="glass rounded-3xl p-5 mb-5 hidden fade">
-    <div class="flex flex-wrap justify-between gap-4 items-center">
-      <div>
-        <div class="text-2xl font-bold text-cyan-400" id="welcomeName"></div>
-        <div class="text-gray-400 text-sm">Member access granted</div>
-      </div><div class="flex gap-4 items-center">
-    <div class="glass px-5 py-3 rounded-2xl neon">
-      🪙 <span id="coinBalance">0</span> CoinX
+/* TAG */
+.tag{
+  display:inline-block;
+  border:1px solid #38bdf8;
+  padding:5px 10px;
+  border-radius:8px;
+  margin:5px;
+}
+
+/* TERMINAL */
+.terminal{
+  background:black;
+  color:#22c55e;
+  padding:15px;
+  border-radius:10px;
+  font-size:14px;
+  height:200px;
+  overflow:auto;
+}
+
+/* LINKS */
+a{color:#38bdf8;text-decoration:none}
+
+footer{
+  text-align:center;
+  padding:20px;
+  color:#64748b;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<header>
+  <h1>GENSHI</h1>
+  <p class="typing">Future Developer | Red Team Elite | Cybersecurity</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+  <h2>📌 Thông tin</h2>
+  <p>Ngày sinh: 31/10/2012</p>
+  <p>Địa chỉ: New York, USA</p>
+</div>
+
+<div class="card">
+  <h2>💻 Kĩ năng</h2>
+  <span class="tag">Cybersecurity</span>
+  <span class="tag">Python</span>
+  <span class="tag">Networking</span>
+  <span class="tag">Pentest</span>
+</div>
+
+<div class="card">
+  <h2>🚀 Projects</h2>
+  <div class="grid">
+    <div class="item">
+      <b>Recon Tool</b>
+      <p>Scan subdomain + port</p>
     </div>
-
-    <button onclick="logout()" class="bg-red-500 hover:bg-red-400 px-4 py-2 rounded-2xl">
-      Logout
-    </button>
+    <div class="item">
+      <b>Password Checker</b>
+      <p>Test độ mạnh mật khẩu</p>
+    </div>
   </div>
 </div>
 
-  </div>  <div class="grid lg:grid-cols-3 gap-5"><!-- LEFT -->
-<div class="space-y-5">
+<div class="card">
+  <h2>🛠 Tools</h2>
+  <span class="tag">Nmap</span>
+  <span class="tag">Burp Suite</span>
+  <span class="tag">Sqlmap</span>
+  <span class="tag">Wireshark</span>
+</div>
 
-  <div class="glass rounded-3xl p-5 fade">
-    <h2 class="text-xl text-cyan-400 mb-4">Categories</h2>
-
-    <div class="space-y-3">
-      <div class="bg-black/30 p-4 rounded-2xl hover:bg-cyan-500/20 cursor-pointer transition">
-        Combo Accounts
-      </div>
-
-      <div class="bg-black/30 p-4 rounded-2xl hover:bg-cyan-500/20 cursor-pointer transition">
-        Fake Databases
-      </div>
-
-      <div class="bg-black/30 p-4 rounded-2xl hover:bg-cyan-500/20 cursor-pointer transition">
-        Streaming Access
-      </div>
-
-      <div class="bg-black/30 p-4 rounded-2xl hover:bg-cyan-500/20 cursor-pointer transition">
-        Random Drops
-      </div>
+<div class="card">
+  <h2>📄 Writeups</h2>
+  <div class="grid">
+    <div class="item">
+      <b>SQL Injection</b>
+      <p>Exploit login bypass</p>
     </div>
-  </div>
-
-  <div class="glass rounded-3xl p-5 fade">
-    <h2 class="text-xl text-pink-400 mb-4">System Stats</h2>
-
-    <div class="space-y-3 text-sm">
-      <div class="flex justify-between">
-        <span>Users Online</span>
-        <span id="onlineCount">12</span>
-      </div>
-
-      <div class="flex justify-between">
-        <span>Market Posts</span>
-        <span id="postCount">0</span>
-      </div>
-
-      <div class="flex justify-between">
-        <span>Total CoinX</span>
-        <span id="totalCoin">0</span>
-      </div>
+    <div class="item">
+      <b>XSS</b>
+      <p>Stored & Reflected attack</p>
     </div>
   </div>
 </div>
 
-<!-- CENTER -->
-<div class="space-y-5 lg:col-span-2">
+<div class="card">
+  <h2>🖥 Terminal</h2>
+  <div class="terminal" id="terminal"></div>
+</div>
 
-  <!-- TASKS -->
-  <section id="tasksTab" class="glass rounded-3xl p-5 fade">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl text-yellow-400">TikTok Reward Task</h2>
-      <div class="text-sm text-gray-400">+400 CoinX per valid video</div>
-    </div>
-
-    <div class="space-y-3">
-      <input
-        id="taskLink"
-        type="text"
-        placeholder="Paste TikTok link..."
-        class="w-full bg-black/40 p-4 rounded-2xl outline-none border border-transparent focus:border-cyan-400"
-      />
-
-      <button
-        onclick="submitTask()"
-        class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold py-4 rounded-2xl transition"
-      >
-        Validate Link
-      </button>
-    </div>
-  </section>
-
-  <!-- MARKET -->
-  <section id="marketTab" class="glass rounded-3xl p-5 fade">
-
-    <div class="flex justify-between items-center mb-5">
-      <h2 class="text-2xl text-cyan-400">Marketplace</h2>
-
-      <button
-        onclick="openSellModal()"
-        class="bg-cyan-500 hover:bg-cyan-400 px-5 py-3 rounded-2xl font-bold"
-      >
-        Sell Data
-      </button>
-    </div>
-
-    <div id="marketPosts" class="space-y-4"></div>
-  </section>
-
-  <!-- CHAT -->
-  <section id="chatTab" class="glass rounded-3xl p-5 fade">
-    <h2 class="text-2xl text-pink-400 mb-4">Global Chat</h2>
-
-    <div id="chatBox" class="h-[300px] overflow-y-auto scrollbar space-y-3 mb-4"></div>
-
-    <div class="flex gap-3">
-      <input
-        id="chatInput"
-        type="text"
-        placeholder="Type message..."
-        class="flex-1 bg-black/40 p-4 rounded-2xl outline-none"
-      />
-
-      <button
-        onclick="sendMessage()"
-        class="bg-pink-500 hover:bg-pink-400 px-6 rounded-2xl"
-      >
-        Send
-      </button>
-    </div>
-  </section>
+<div class="card">
+  <h2>🌐 Liên hệ</h2>
+  <p><a href="https://www.facebook.com/share/1EEnYU7oFR/">Facebook</a></p>
+  <p><a href="https://tiktok.com/@pronator01">TikTok</a></p>
+</div>
 
 </div>
 
-  </div>
-</div><!-- LOGIN MODAL --><div id="loginModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-  <div class="glass rounded-3xl p-6 w-[360px] fade"><h2 class="text-3xl text-cyan-400 mb-5">Access Portal</h2>
+<footer>
+© 2026 GENSHI | Cybersecurity
+</footer>
 
-<input
-  id="usernameInput"
-  type="text"
-  placeholder="Username"
-  class="w-full bg-black/40 p-4 rounded-2xl mb-4 outline-none"
-/>
+<script>
+// TERMINAL EFFECT
+const text = [
+"Initializing...",
+"Loading modules...",
+"Bypassing firewall...",
+"Access granted.",
+"Welcome GENSHI"
+];
 
-<button
-  onclick="register()"
-  class="w-full bg-cyan-500 hover:bg-cyan-400 py-4 rounded-2xl font-bold"
->
-  Enter System
-</button>
+let i=0;
+let term = document.getElementById("terminal");
 
-  </div>
-</div><!-- SELL MODAL --><div id="sellModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-  <div class="glass rounded-3xl p-6 w-[420px] fade"><h2 class="text-3xl text-cyan-400 mb-5">Create Listing</h2>
-
-<input
-  id="postTitle"
-  type="text"
-  placeholder="Title"
-  class="w-full bg-black/40 p-4 rounded-2xl mb-3 outline-none"
-/>
-
-<textarea
-  id="postDesc"
-  placeholder="Description"
-  class="w-full bg-black/40 p-4 rounded-2xl mb-3 outline-none h-[120px]"
-></textarea>
-
-<input
-  id="postPrice"
-  type="number"
-  placeholder="Price"
-  class="w-full bg-black/40 p-4 rounded-2xl mb-4 outline-none"
-/>
-
-<div class="flex gap-3">
-  <button
-    onclick="createPost()"
-    class="flex-1 bg-cyan-500 hover:bg-cyan-400 py-4 rounded-2xl"
-  >
-    Publish
-  </button>
-
-  <button
-    onclick="closeSellModal()"
-    class="flex-1 bg-red-500 hover:bg-red-400 py-4 rounded-2xl"
-  >
-    Cancel
-  </button>
-</div>
-
-  </div>
-</div><script>
-
-let currentUser = null;
-
-let users = JSON.parse(localStorage.getItem('coinx_users')) || [];
-let posts = JSON.parse(localStorage.getItem('coinx_posts')) || [];
-let chats = JSON.parse(localStorage.getItem('coinx_chat')) || [];
-
-function saveData() {
-  localStorage.setItem('coinx_users', JSON.stringify(users));
-  localStorage.setItem('coinx_posts', JSON.stringify(posts));
-  localStorage.setItem('coinx_chat', JSON.stringify(chats));
-}
-
-function openLogin() {
-  document.getElementById('loginModal').classList.remove('hidden');
-}
-
-function register() {
-  const username = document.getElementById('usernameInput').value.trim();
-
-  if (!username) {
-    return alert('Enter username');
+function type(){
+  if(i < text.length){
+    term.innerHTML += text[i] + "<br>";
+    i++;
+    setTimeout(type,800);
   }
-
-  let existing = users.find(u => u.username === username);
-
-  if (existing) {
-    currentUser = existing;
-  } else {
-    currentUser = {
-      username,
-      balance: 1600
-    };
-
-    users.push(currentUser);
-  }
-
-  saveData();
-  updateUI();
-
-  document.getElementById('loginModal').classList.add('hidden');
 }
+type();
 
-function logout() {
-  currentUser = null;
-  updateUI();
-}
+// PARTICLES
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
 
-function updateUI() {
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-  const authArea = document.getElementById('authArea');
+let particles = [];
 
-  if (!currentUser) {
-    authArea.innerHTML = `
-      <button onclick="openLogin()" class="bg-cyan-500 hover:bg-cyan-400 px-5 py-2 rounded-2xl font-bold">
-        Login
-      </button>
-    `;
-
-    document.getElementById('userPanel').classList.add('hidden');
-
-  } else {
-
-    authArea.innerHTML = `
-      <div class="glass px-4 py-2 rounded-2xl">
-        ${currentUser.username}
-      </div>
-    `;
-
-    document.getElementById('userPanel').classList.remove('hidden');
-
-    document.getElementById('welcomeName').innerText = currentUser.username;
-    document.getElementById('coinBalance').innerText = currentUser.balance;
-  }
-
-  renderPosts();
-  renderChat();
-  updateStats();
-}
-
-function updateStats() {
-  document.getElementById('postCount').innerText = posts.length;
-
-  const total = users.reduce((a,b)=>a+b.balance,0);
-
-  document.getElementById('totalCoin').innerText = total;
-}
-
-function openSellModal() {
-  if (!currentUser) {
-    return alert('Login first');
-  }
-
-  document.getElementById('sellModal').classList.remove('hidden');
-}
-
-function closeSellModal() {
-  document.getElementById('sellModal').classList.add('hidden');
-}
-
-function createPost() {
-
-  const title = document.getElementById('postTitle').value;
-  const desc = document.getElementById('postDesc').value;
-  const price = document.getElementById('postPrice').value;
-
-  if (!title || !price) {
-    return alert('Missing fields');
-  }
-
-  posts.unshift({
-    title,
-    desc,
-    price,
-    seller: currentUser.username
-  });
-
-  saveData();
-  renderPosts();
-  closeSellModal();
-  updateStats();
-}
-
-function renderPosts() {
-
-  const market = document.getElementById('marketPosts');
-  market.innerHTML = '';
-
-  posts.forEach((p, index) => {
-
-    market.innerHTML += `
-      <div class="glass rounded-3xl p-5 hover:scale-[1.01] transition-all fade">
-
-        <div class="flex justify-between items-center mb-3">
-          <div>
-            <div class="text-xl text-cyan-300 font-bold">${p.title}</div>
-            <div class="text-sm text-gray-400">seller: ${p.seller}</div>
-          </div>
-
-          <div class="text-yellow-400 font-bold text-lg">
-            🪙 ${p.price}
-          </div>
-        </div>
-
-        <div class="text-gray-300 mb-4">
-          ${p.desc}
-        </div>
-
-        <button
-          onclick="buyPost(${index})"
-          class="bg-cyan-500 hover:bg-cyan-400 px-5 py-3 rounded-2xl font-bold"
-        >
-          Buy Now
-        </button>
-      </div>
-    `;
+for(let i=0;i<80;i++){
+  particles.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    r:Math.random()*2,
+    d:Math.random()*1
   });
 }
 
-function buyPost(index) {
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#22c55e";
+  particles.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fill();
+  });
+  update();
+}
 
-  if (!currentUser) {
-    return alert('Login first');
-  }
-
-  const post = posts[index];
-
-  if (currentUser.balance < post.price) {
-    return alert('Not enough CoinX');
-  }
-
-  currentUser.balance -= Number(post.price);
-
-  users = users.map(u => {
-
-    if (u.username === currentUser.username) {
-      return currentUser;
+function update(){
+  particles.forEach(p=>{
+    p.y += p.d;
+    if(p.y>canvas.height){
+      p.y=0;
+      p.x=Math.random()*canvas.width;
     }
-
-    if (u.username === post.seller) {
-      u.balance += Number(post.price);
-    }
-
-    return u;
   });
-
-  saveData();
-  updateUI();
-
-  alert('Purchase successful');
 }
 
-function sendMessage() {
+setInterval(draw,30);
+</script>
 
-  if (!currentUser) {
-    return alert('Login first');
-  }
-
-  const input = document.getElementById('chatInput');
-  const message = input.value.trim();
-
-  if (!message) return;
-
-  chats.push({
-    user: currentUser.username,
-    message
-  });
-
-  saveData();
-  renderChat();
-
-  input.value = '';
-}
-
-function renderChat() {
-
-  const chatBox = document.getElementById('chatBox');
-  chatBox.innerHTML = '';
-
-  chats.slice(-40).forEach(c => {
-
-    chatBox.innerHTML += `
-      <div class="glass p-4 rounded-2xl fade">
-        <div class="text-cyan-400 text-sm mb-1">${c.user}</div>
-        <div>${c.message}</div>
-      </div>
-    `;
-  });
-
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-function submitTask() {
-
-  if (!currentUser) {
-    return alert('Login first');
-  }
-
-  const link = document.getElementById('taskLink').value;
-
-  if (!link.includes('tiktok')) {
-    return alert('Invalid TikTok link');
-  }
-
-  currentUser.balance += 400;
-
-  users = users.map(u => {
-    if (u.username === currentUser.username) {
-      return currentUser;
-    }
-    return u;
-  });
-
-  saveData();
-  updateUI();
-
-  alert('+400 CoinX rewarded');
-}
-
-function switchTab(tab) {
-
-  document.getElementById('marketTab').scrollIntoView({
-    behavior: 'smooth'
-  });
-
-  if (tab === 'tasks') {
-    document.getElementById('tasksTab').scrollIntoView({
-      behavior: 'smooth'
-    });
-  }
-
-  if (tab === 'chat') {
-    document.getElementById('chatTab').scrollIntoView({
-      behavior: 'smooth'
-    });
-  }
-}
-
-updateUI();
-
-</script></body>
+</body>
 </html>
